@@ -7,12 +7,13 @@ namespace battleTest {
 
 using ObjectId = uint64_t;
 
+class GameObjectFactory;
+
 class GameObject
 {
-public:
-  static std::unique_ptr<GameObject> create(ObjectId objectId);
-  static void destroy(GameObject *obj);
+  friend class GameObjectFactory;
 
+public:
   virtual ~GameObject() = default;
 
   GameObject(const GameObject &) = delete;
@@ -32,5 +33,19 @@ protected:
 
   ObjectId objectId_;
 };
+
+struct GameObjectDeleter
+{
+  void operator()(GameObject *obj) const
+  {
+    if (obj != nullptr) {
+      obj->beforeDestroy();
+      obj->destroy();
+      delete obj;
+    }
+  }
+};
+
+using GameObjectPtr = std::unique_ptr<GameObject, GameObjectDeleter>;
 
 }// namespace battleTest

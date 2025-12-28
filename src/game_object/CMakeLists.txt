@@ -1,6 +1,6 @@
 include(GenerateExportHeader)
 
-add_library(game_object GameObject.cpp)
+add_library(game_object GameObject.cpp GameObjectFactory.cpp)
 
 add_library(battleTest::game_object ALIAS game_object)
 
