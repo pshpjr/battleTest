@@ -1,13 +1,18 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 namespace battleTest {
+
+using ObjectId = uint64_t;
 
 class GameObject
 {
 public:
-  explicit GameObject(uint64_t objectId);
+  static std::unique_ptr<GameObject> create(ObjectId objectId);
+  static void destroy(GameObject *obj);
+
   virtual ~GameObject() = default;
 
   GameObject(const GameObject &) = delete;
@@ -15,7 +20,7 @@ public:
   GameObject(GameObject &&) = delete;
   GameObject &operator=(GameObject &&) = delete;
 
-  [[nodiscard]] uint64_t getObjectId() const noexcept { return objectId_; }
+  [[nodiscard]] ObjectId getObjectId() const noexcept { return objectId_; }
 
   virtual void init() {}
   virtual void afterInit() {}
@@ -23,7 +28,9 @@ public:
   virtual void destroy() {}
 
 protected:
-  uint64_t objectId_;
+  explicit GameObject(ObjectId objectId);
+
+  ObjectId objectId_;
 };
 
 }// namespace battleTest
