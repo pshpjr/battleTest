@@ -1,15 +1,14 @@
 #pragma once
 
+#include "battleTest/Observer.hpp"
+#include "battleTest/StatEvents.hpp"
+#include "battleTest/StatTypes.hpp"
 #include <map>
-#include <string>
 #include <optional>
 
 namespace battleTest {
 
-// 스탯 키 타입 - 향후 enum이나 다른 타입으로 변경 가능
-using StatKey = std::string;
-
-class StatComponent
+class StatComponent : public Subject<StatEvent>
 {
 public:
   StatComponent() = default;

@@ -5,6 +5,9 @@
 #include <battleTest/StatComponent.hpp>
 #include <battleTest/CombatStatus.hpp>
 #include <battleTest/CombatSystem.hpp>
+#include <battleTest/Observer.hpp>
+#include <battleTest/StatEvents.hpp>
+#include <vector>
 
 
 TEST_CASE("Factorials are computed", "[factorial]")
@@ -204,5 +207,148 @@ TEST_CASE("CombatSystem utility functions", "[combat]")
 
     stats1.setStat(CombatSystem::STAT_HP, -10.0);
     REQUIRE_FALSE(CombatSystem::isAlive(entity1));
+  }
+}
+}
+
+// 테스트용 옵저버 클래스
+class TestStatObserver : public battleTest::Observer<battleTest::StatEvent>
+{
+public:
+  std::vector<battleTest::StatEvent> events;
+
+  void onNotify(const battleTest::StatEvent &event) override { events.push_back(event); }
+
+  void clear() { events.clear(); }
+};
+
+TEST_CASE("Observer pattern for StatComponent", "[observer]")
+{
+  using namespace battleTest;
+
+  StatComponent stats;
+  TestStatObserver observer;
+
+  SECTION("Observer receives stat changed events")
+  {
+    stats.addObserver(&observer);
+
+    stats.setStat("HP", 100.0);
+
+    REQUIRE(observer.events.size() == 1);
+    REQUIRE(observer.events[0].type == StatEventType::Changed);
+    REQUIRE(observer.events[0].statName == "HP");
+    REQUIRE_FALSE(observer.events[0].oldValue.has_value());
+    REQUIRE(observer.events[0].newValue.value() == 100.0);
+  }
+
+  SECTION("Observer receives multiple events")
+  {
+    stats.addObserver(&observer);
+
+    stats.setStat("HP", 100.0);
+    stats.setStat("Attack", 50.0);
+    stats.setStat("HP", 150.0);
+
+    REQUIRE(observer.events.size() == 3);
+
+    // First event: HP set to 100
+    REQUIRE(observer.events[0].statName == "HP");
+    REQUIRE(observer.events[0].newValue.value() == 100.0);
+
+    // Second event: Attack set to 50
+    REQUIRE(observer.events[1].statName == "Attack");
+    REQUIRE(observer.events[1].newValue.value() == 50.0);
+
+    // Third event: HP changed from 100 to 150
+    REQUIRE(observer.events[2].statName == "HP");
+    REQUIRE(observer.events[2].oldValue.value() == 100.0);
+    REQUIRE(observer.events[2].newValue.value() == 150.0);
+  }
+
+  SECTION("Observer receives addToStat events")
+  {
+    stats.addObserver(&observer);
+
+    stats.setStat("HP", 100.0);
+    observer.clear();
+
+    stats.addToStat("HP", 50.0);
+
+    REQUIRE(observer.events.size() == 1);
+    REQUIRE(observer.events[0].type == StatEventType::Changed);
+    REQUIRE(observer.events[0].oldValue.value() == 100.0);
+    REQUIRE(observer.events[0].newValue.value() == 150.0);
+  }
+
+  SECTION("Observer receives stat removed events")
+  {
+    stats.addObserver(&observer);
+
+    stats.setStat("HP", 100.0);
+    observer.clear();
+
+    stats.removeStat("HP");
+
+    REQUIRE(observer.events.size() == 1);
+    REQUIRE(observer.events[0].type == StatEventType::Removed);
+    REQUIRE(observer.events[0].statName == "HP");
+    REQUIRE(observer.events[0].oldValue.value() == 100.0);
+    REQUIRE_FALSE(observer.events[0].newValue.has_value());
+  }
+
+  SECTION("Observer receives clear all stats event")
+  {
+    stats.addObserver(&observer);
+
+    stats.setStat("HP", 100.0);
+    stats.setStat("Attack", 50.0);
+    observer.clear();
+
+    stats.clearStats();
+
+    REQUIRE(observer.events.size() == 1);
+    REQUIRE(observer.events[0].type == StatEventType::Cleared);
+  }
+
+  SECTION("Multiple observers receive events")
+  {
+    TestStatObserver observer1;
+    TestStatObserver observer2;
+
+    stats.addObserver(&observer1);
+    stats.addObserver(&observer2);
+
+    stats.setStat("HP", 100.0);
+
+    REQUIRE(observer1.events.size() == 1);
+    REQUIRE(observer2.events.size() == 1);
+    REQUIRE(observer1.events[0].newValue.value() == 100.0);
+    REQUIRE(observer2.events[0].newValue.value() == 100.0);
+  }
+
+  SECTION("Observer can be removed")
+  {
+    stats.addObserver(&observer);
+
+    stats.setStat("HP", 100.0);
+    REQUIRE(observer.events.size() == 1);
+
+    stats.removeObserver(&observer);
+    stats.setStat("Attack", 50.0);
+
+    // No new events after removal
+    REQUIRE(observer.events.size() == 1);
+  }
+
+  SECTION("Duplicate observer registration is ignored")
+  {
+    stats.addObserver(&observer);
+    stats.addObserver(&observer);// Duplicate
+
+    stats.setStat("HP", 100.0);
+
+    // Should only receive one event
+    REQUIRE(observer.events.size() == 1);
   }
 }
