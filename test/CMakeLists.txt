@@ -36,6 +36,7 @@ target_link_libraries(
           battleTest::battleTest_options
           battleTest::sample_library
           battleTest::stat_component
+          battleTest::combat_status
           battleTest::combat_system
           Catch2::Catch2WithMain)
 

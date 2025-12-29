@@ -6,7 +6,7 @@ add_library(battleTest::combat_system ALIAS combat_system)
 
 target_link_libraries(combat_system
   PRIVATE battleTest_options battleTest_warnings
-  PUBLIC battleTest::stat_component)
+  PUBLIC battleTest::combat_status battleTest::stat_component)
 
 target_include_directories(combat_system ${WARNING_GUARD} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                                                                   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)

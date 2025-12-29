@@ -3,6 +3,7 @@
 
 #include <battleTest/sample_library.hpp>
 #include <battleTest/StatComponent.hpp>
+#include <battleTest/CombatStatus.hpp>
 #include <battleTest/CombatSystem.hpp>
 
 
@@ -96,14 +97,17 @@ TEST_CASE("CombatSystem basic combat", "[combat]")
 {
   using namespace battleTest;
 
-  StatComponent attacker;
-  StatComponent defender;
+  StatComponent attackerStats;
+  StatComponent defenderStats;
 
   SECTION("Basic attack without defense")
   {
-    attacker.setStat(CombatSystem::STAT_ATTACK, 50.0);
-    defender.setStat(CombatSystem::STAT_HP, 100.0);
-    defender.setStat(CombatSystem::STAT_DEFENSE, 0.0);
+    attackerStats.setStat(CombatSystem::STAT_ATTACK, 50.0);
+    defenderStats.setStat(CombatSystem::STAT_HP, 100.0);
+    defenderStats.setStat(CombatSystem::STAT_DEFENSE, 0.0);
+
+    CombatStatus attacker(attackerStats);
+    CombatStatus defender(defenderStats);
 
     auto result = CombatSystem::attack(attacker, defender);
 
@@ -111,15 +115,18 @@ TEST_CASE("CombatSystem basic combat", "[combat]")
     REQUIRE(result.remainingHP == 50.0);
     REQUIRE_FALSE(result.targetDefeated);
 
-    auto defenderHP = defender.getStat(CombatSystem::STAT_HP);
+    auto defenderHP = defenderStats.getStat(CombatSystem::STAT_HP);
     REQUIRE(defenderHP.value() == 50.0);
   }
 
   SECTION("Attack with defense")
   {
-    attacker.setStat(CombatSystem::STAT_ATTACK, 50.0);
-    defender.setStat(CombatSystem::STAT_HP, 100.0);
-    defender.setStat(CombatSystem::STAT_DEFENSE, 20.0);
+    attackerStats.setStat(CombatSystem::STAT_ATTACK, 50.0);
+    defenderStats.setStat(CombatSystem::STAT_HP, 100.0);
+    defenderStats.setStat(CombatSystem::STAT_DEFENSE, 20.0);
+
+    CombatStatus attacker(attackerStats);
+    CombatStatus defender(defenderStats);
 
     auto result = CombatSystem::attack(attacker, defender);
 
@@ -130,9 +137,12 @@ TEST_CASE("CombatSystem basic combat", "[combat]")
 
   SECTION("Minimum damage is 1")
   {
-    attacker.setStat(CombatSystem::STAT_ATTACK, 10.0);
-    defender.setStat(CombatSystem::STAT_HP, 100.0);
-    defender.setStat(CombatSystem::STAT_DEFENSE, 50.0);
+    attackerStats.setStat(CombatSystem::STAT_ATTACK, 10.0);
+    defenderStats.setStat(CombatSystem::STAT_HP, 100.0);
+    defenderStats.setStat(CombatSystem::STAT_DEFENSE, 50.0);
+
+    CombatStatus attacker(attackerStats);
+    CombatStatus defender(defenderStats);
 
     auto result = CombatSystem::attack(attacker, defender);
 
@@ -142,9 +152,12 @@ TEST_CASE("CombatSystem basic combat", "[combat]")
 
   SECTION("Target defeated")
   {
-    attacker.setStat(CombatSystem::STAT_ATTACK, 150.0);
-    defender.setStat(CombatSystem::STAT_HP, 100.0);
-    defender.setStat(CombatSystem::STAT_DEFENSE, 0.0);
+    attackerStats.setStat(CombatSystem::STAT_ATTACK, 150.0);
+    defenderStats.setStat(CombatSystem::STAT_HP, 100.0);
+    defenderStats.setStat(CombatSystem::STAT_DEFENSE, 0.0);
+
+    CombatStatus attacker(attackerStats);
+    CombatStatus defender(defenderStats);
 
     auto result = CombatSystem::attack(attacker, defender);
 
@@ -160,31 +173,36 @@ TEST_CASE("CombatSystem utility functions", "[combat]")
 {
   using namespace battleTest;
 
-  StatComponent entity1;
-  StatComponent entity2;
+  StatComponent stats1;
+  StatComponent stats2;
 
   SECTION("canCombat checks")
   {
+    CombatStatus entity1(stats1);
+    CombatStatus entity2(stats2);
+
     REQUIRE_FALSE(CombatSystem::canCombat(entity1, entity2));
 
-    entity1.setStat(CombatSystem::STAT_HP, 100.0);
+    stats1.setStat(CombatSystem::STAT_HP, 100.0);
     REQUIRE_FALSE(CombatSystem::canCombat(entity1, entity2));
 
-    entity2.setStat(CombatSystem::STAT_HP, 100.0);
+    stats2.setStat(CombatSystem::STAT_HP, 100.0);
     REQUIRE(CombatSystem::canCombat(entity1, entity2));
   }
 
   SECTION("isAlive checks")
   {
+    CombatStatus entity1(stats1);
+
     REQUIRE_FALSE(CombatSystem::isAlive(entity1));
 
-    entity1.setStat(CombatSystem::STAT_HP, 100.0);
+    stats1.setStat(CombatSystem::STAT_HP, 100.0);
     REQUIRE(CombatSystem::isAlive(entity1));
 
-    entity1.setStat(CombatSystem::STAT_HP, 0.0);
+    stats1.setStat(CombatSystem::STAT_HP, 0.0);
     REQUIRE_FALSE(CombatSystem::isAlive(entity1));
 
-    entity1.setStat(CombatSystem::STAT_HP, -10.0);
+    stats1.setStat(CombatSystem::STAT_HP, -10.0);
     REQUIRE_FALSE(CombatSystem::isAlive(entity1));
   }
 }
