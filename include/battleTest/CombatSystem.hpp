@@ -25,10 +25,10 @@ public:
   // 엔티티가 살아있는지 확인 (HP > 0)
   static bool isAlive(const StatComponent &entity);
 
-  // 기본 스탯 이름
-  static constexpr const char *STAT_HP = "HP";
-  static constexpr const char *STAT_ATTACK = "Attack";
-  static constexpr const char *STAT_DEFENSE = "Defense";
+  // 기본 스탯 키
+  inline static const StatKey STAT_HP = "HP";
+  inline static const StatKey STAT_ATTACK = "Attack";
+  inline static const StatKey STAT_DEFENSE = "Defense";
 };
 
 }// namespace battleTest

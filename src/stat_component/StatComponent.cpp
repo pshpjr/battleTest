@@ -2,27 +2,27 @@
 
 namespace battleTest {
 
-void StatComponent::setStat(const std::string &statName, double value) { stats_[statName] = value; }
+void StatComponent::setStat(const StatKey &statName, double value) { stats_[statName] = value; }
 
-std::optional<double> StatComponent::getStat(const std::string &statName) const
+std::optional<double> StatComponent::getStat(const StatKey &statName) const
 {
   auto it = stats_.find(statName);
   if (it != stats_.end()) { return it->second; }
   return std::nullopt;
 }
 
-double StatComponent::getStatOr(const std::string &statName, double defaultValue) const
+double StatComponent::getStatOr(const StatKey &statName, double defaultValue) const
 {
   auto it = stats_.find(statName);
   if (it != stats_.end()) { return it->second; }
   return defaultValue;
 }
 
-bool StatComponent::removeStat(const std::string &statName) { return stats_.erase(statName) > 0; }
+bool StatComponent::removeStat(const StatKey &statName) { return stats_.erase(statName) > 0; }
 
-bool StatComponent::hasStat(const std::string &statName) const { return stats_.find(statName) != stats_.end(); }
+bool StatComponent::hasStat(const StatKey &statName) const { return stats_.find(statName) != stats_.end(); }
 
-void StatComponent::addToStat(const std::string &statName, double delta)
+void StatComponent::addToStat(const StatKey &statName, double delta)
 {
   auto it = stats_.find(statName);
   if (it != stats_.end()) {
