@@ -1,3 +1,5 @@
 add_subdirectory(sample_library)
 add_subdirectory(ftxui_sample)
 add_subdirectory(game_object)
+add_subdirectory(stat_component)
+add_subdirectory(combat_system)

@@ -35,6 +35,8 @@ target_link_libraries(
   PRIVATE battleTest::battleTest_warnings
           battleTest::battleTest_options
           battleTest::sample_library
+          battleTest::stat_component
+          battleTest::combat_system
           Catch2::Catch2WithMain)
 
 if(WIN32 AND BUILD_SHARED_LIBS)
