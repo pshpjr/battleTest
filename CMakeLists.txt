@@ -17,6 +17,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread)
 find_package(asio CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 
 # Include directories
 include_directories(include)
@@ -66,7 +67,7 @@ else()
 endif()
 
 # Tests (optional)
-option(BUILD_TESTS "Build tests" OFF)
+option(BUILD_TESTS "Build tests" ON)
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
