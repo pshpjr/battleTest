@@ -1,0 +1,12 @@
+Checks: >
+  -*,
+  readability-*,
+  performance-*,
+  modernize-*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -modernize-use-trailing-return-type
+
+HeaderFilterRegex: '^(src|include|tests)/.*'
+WarningsAsErrors: ''
