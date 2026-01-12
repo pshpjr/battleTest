@@ -1,11 +1,23 @@
+// Formattable.h
 #pragma once
 
+#include <format>
 #include <string>
+#include <concepts>
 
-// 문자열로 변환 가능한 객체의 인터페이스
-class Formattable
-{
-public:
-    virtual ~Formattable() = default;
-    [[nodiscard]] virtual std::string ToString() const = 0;
+// ToString() 메서드 체크용 concept
+template<typename T>
+concept HasToString = requires(const T& t) {
+    { t.ToString() } -> std::convertible_to<std::string>;
 };
+
+#define DEFINE_FORMATTER(Type) \
+static_assert(HasToString<Type>, \
+#Type " must implement 'std::string ToString() const' method"); \
+template<> \
+struct std::formatter<Type> : std::formatter<std::string> { \
+auto format(const Type& obj, auto& ctx) const { \
+return std::formatter<std::string>::format(obj.ToString(), ctx); \
+} \
+}
+
