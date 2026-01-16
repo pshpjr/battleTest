@@ -1,0 +1,21 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "dev",
+    "password": "password",
+    "database": "game_db"
+  },
+  "excluded_tables": [
+    "internal_log",
+    "temp_cache"
+  ],
+  "excluded_stored_procedures": [
+    "sp_internal_helper",
+    "sp_admin_only"
+  ],
+  "output": {
+    "directory": "generated/db",
+    "namespace": "DB"
+  }
+}
