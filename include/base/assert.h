@@ -5,29 +5,25 @@ namespace base
 {
 
 // Assert 핸들러 타입 정의
-using AssertHandler = std::function<void(const char* expr, const char* msg, const char* file, const char* func, const char* line)>;
+using AssertHandler = std::function<void(const char* expr, const char* msg, const char* file, const char* func, int line)>;
 
 // Assert 핸들러 설정
 void SetAssertHandler(AssertHandler handler);
 
 // Check: Debug 빌드에서만 동작
-void Check(const char* expr, const char* msg, const char* file, const char* func, const char* line);
+void Check(const char* expr, const char* msg, const char* file, const char* func, int line);
 
 // Verify: Release 빌드에서도 동작
-void Verify(const char* expr, const char* msg, const char* file, const char* func, const char* line);
+void Verify(const char* expr, const char* msg, const char* file, const char* func, int line);
 
 } // namespace base
-
-// __LINE__을 문자열로 변환하는 헬퍼 매크로
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
 
 // CHECK 매크로: Debug 빌드에서만 동작
 #ifndef NDEBUG
 #define CHECK(expr, msg) \
     do { \
         if (!(expr)) { \
-            ::base::Check(#expr, msg, __FILE__, __FUNCTION__, TOSTRING(__LINE__)); \
+            ::base::Check(#expr, msg, __FILE__, __FUNCTION__, __LINE__); \
         } \
     } while (false)
 #else
@@ -38,6 +34,6 @@ void Verify(const char* expr, const char* msg, const char* file, const char* fun
 #define VERIFY(expr, msg) \
     do { \
         if (!(expr)) { \
-            ::base::Verify(#expr, msg, __FILE__, __FUNCTION__, TOSTRING(__LINE__)); \
+            ::base::Verify(#expr, msg, __FILE__, __FUNCTION__, __LINE__); \
         } \
     } while (false)
